@@ -25,7 +25,7 @@ public final class TestDataUtil {
     public static BookEntity createTestBook(final AuthorEntity author) {
         return BookEntity.builder()
                 .isbn("978-1-2345-6789-0")
-                .title("The Shadow in the Artic")
+                .title("The Shadow in the Attic")
                 .author(author)
                 .build();
     }

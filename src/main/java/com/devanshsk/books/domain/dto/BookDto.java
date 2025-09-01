@@ -1,7 +1,9 @@
-package com.devanshsk.books.domain.entities;
+package com.devanshsk.books.domain.dto;
 
 import com.devanshsk.books.domain.entities.AuthorEntity;
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,15 +13,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Entity
-@Table(name = "books")
-public class BookEntity {
-    @Id
+public class BookDto {
     private String isbn;
     private String title;
     private String yearPublished;
-
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "author_id")
-    private AuthorEntity author;
+    private AuthorDto author;
 }
