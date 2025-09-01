@@ -2,6 +2,7 @@ package com.devanshsk.books.controllers;
 
 import com.devanshsk.books.TestDataUtil;
 import com.devanshsk.books.domain.entities.AuthorEntity;
+import com.devanshsk.books.services.AuthorService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -24,11 +25,14 @@ public class AuthorControllerIntegrationTests {
 
     private MockMvc mockMvc;
     private ObjectMapper objectMapper;
+    private AuthorService authorService;
+
 
     @Autowired
-    public AuthorControllerIntegrationTests(MockMvc mockMvc){
+    public AuthorControllerIntegrationTests(MockMvc mockMvc, AuthorService authorService){
         this.mockMvc = mockMvc;
         this.objectMapper = new ObjectMapper();
+        this.authorService = authorService;
     }
 
     @Test
@@ -66,6 +70,31 @@ public class AuthorControllerIntegrationTests {
                 MockMvcResultMatchers.jsonPath("$.name").value("John Doe")
         ).andExpect(
                 MockMvcResultMatchers.jsonPath("$.age").value("80")
+        );
+    }
+
+    @Test
+    public void testThatListAuthorsReturnsHttpStatus200() throws Exception {
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/authors")
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(MockMvcResultMatchers.status().isOk());
+    }
+
+    @Test
+    public void testThatListAuthorsReturnsListOfAuthors() throws Exception {
+        AuthorEntity testAuthorEntityA = TestDataUtil.createTestAuthor();
+        authorService.createAuthor(testAuthorEntityA);
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/authors")
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$[0].id").isNumber()
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$[0].name").value("John Doe")
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$[0].age").value(80)
         );
     }
 }

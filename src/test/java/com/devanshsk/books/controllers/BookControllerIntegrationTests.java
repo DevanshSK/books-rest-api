@@ -4,6 +4,7 @@ import com.devanshsk.books.TestDataUtil;
 import com.devanshsk.books.domain.dto.BookDto;
 import com.devanshsk.books.domain.entities.AuthorEntity;
 import com.devanshsk.books.domain.entities.BookEntity;
+import com.devanshsk.books.services.BookService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,11 +25,13 @@ import org.springframework.http.MediaType;
 public class BookControllerIntegrationTests {
     private MockMvc mockMvc;
     private ObjectMapper objectMapper;
+    private BookService bookService;
 
     @Autowired
-    public BookControllerIntegrationTests(MockMvc mockMvc) {
+    public BookControllerIntegrationTests(MockMvc mockMvc, BookService bookService) {
         this.mockMvc = mockMvc;
         this.objectMapper = new ObjectMapper();
+        this.bookService = bookService;
     }
 
     @Test
@@ -60,6 +63,32 @@ public class BookControllerIntegrationTests {
                 MockMvcResultMatchers.jsonPath("$.isbn").value("978-1-2345-6789-0")
         ).andExpect(
                 MockMvcResultMatchers.jsonPath("$.title").value("The Shadow in the Attic")
+        );
+    }
+
+    @Test
+    public void testThatListBooksReturnsHttpStatus200Ok() throws Exception {
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/books")
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(
+                MockMvcResultMatchers.status().isOk()
+        );
+    }
+
+    @Test
+    public void testThatListBooksReturnsBook() throws Exception {
+        AuthorEntity author = TestDataUtil.createTestAuthor();
+        BookEntity testBook = TestDataUtil.createTestBook(author);
+        bookService.createBook(testBook.getIsbn(), testBook);
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/books")
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$[0].isbn").value("978-1-2345-6789-0")
+        ).andExpect(
+                MockMvcResultMatchers.jsonPath("$[0].title").value("The Shadow in the Attic")
         );
     }
 
