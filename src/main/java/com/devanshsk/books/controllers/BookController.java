@@ -1,5 +1,6 @@
 package com.devanshsk.books.controllers;
 
+import com.devanshsk.books.domain.dto.AuthorDto;
 import com.devanshsk.books.domain.dto.BookDto;
 import com.devanshsk.books.domain.entities.BookEntity;
 import com.devanshsk.books.mappers.Mapper;
@@ -10,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -37,6 +39,15 @@ public class BookController {
     public List<BookDto> listBooks(){
         List<BookEntity> books = bookService.findAll();
         return books.stream().map(bookMapper::mapTo).collect(Collectors.toList());
+    }
+
+    @GetMapping("/{isbn}")
+    public ResponseEntity<BookDto> getBook(@PathVariable("isbn") String isbn){
+        Optional<BookEntity> foundBook = bookService.findOne(isbn);
+        return foundBook.map(bookEntity -> {
+            BookDto bookDto = bookMapper.mapTo(bookEntity);
+            return new ResponseEntity<>(bookDto, HttpStatus.OK);
+        }).orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
 }

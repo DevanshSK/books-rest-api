@@ -6,8 +6,7 @@ import com.devanshsk.books.services.BookService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
+import java.util.Optional;
 
 @Service
 public class BookServiceImpl implements BookService {
@@ -27,7 +26,11 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public List<BookEntity> findAll() {
-        return StreamSupport.stream(bookRepository.findAll().spliterator(), false)
-                .collect(Collectors.toList());
+        return bookRepository.findAll();
+    }
+
+    @Override
+    public Optional<BookEntity> findOne(String isbn) {
+        return bookRepository.findById(isbn);
     }
 }
