@@ -19,17 +19,11 @@ public class AuthorController {
     private AuthorService authorService;
     private Mapper<AuthorEntity, AuthorDto> authorMapper;
 
-
     public AuthorController(AuthorService authorService, Mapper<AuthorEntity, AuthorDto> authorMapper){
         this.authorService = authorService;
         this.authorMapper = authorMapper;
     }
-    @PostMapping(path = "/authors")
-    public ResponseEntity<AuthorDto> createAuthor(@RequestBody AuthorDto author){
-        AuthorEntity authorEntity = authorMapper.mapFrom(author);
-        AuthorEntity savedAuthor = authorService.createAuthor(authorEntity);
-        return new ResponseEntity<>(authorMapper.mapTo(savedAuthor), HttpStatus.CREATED);
-    }
+
 
     @GetMapping(path = "/authors")
     public List<AuthorDto> listAuthors(){
@@ -44,5 +38,29 @@ public class AuthorController {
             AuthorDto authorDto = authorMapper.mapTo(authorEntity);
             return new ResponseEntity<>(authorDto, HttpStatus.OK);
         }).orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    }
+
+    @PostMapping(path = "/authors")
+    public ResponseEntity<AuthorDto> createAuthor(@RequestBody AuthorDto author){
+        AuthorEntity authorEntity = authorMapper.mapFrom(author);
+        AuthorEntity savedAuthor = authorService.save(authorEntity);
+        return new ResponseEntity<>(authorMapper.mapTo(savedAuthor), HttpStatus.CREATED);
+    }
+
+    @PutMapping("/authors/{id}")
+    public ResponseEntity<AuthorDto> fullUpdateAuthor(
+            @PathVariable("id") Long id,
+            @RequestBody AuthorDto authorDto
+    ){
+        // Check if author exists
+        if(!authorService.isExists(id)){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        // Update the Author
+        authorDto.setId(id);
+        AuthorEntity authorEntity = authorMapper.mapFrom(authorDto);
+        AuthorEntity savedAuthorEntity = authorService.save(authorEntity);
+        return new ResponseEntity<>(authorMapper.mapTo(savedAuthorEntity), HttpStatus.OK);
     }
 }
