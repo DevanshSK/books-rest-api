@@ -3,6 +3,8 @@ package com.devanshsk.books.services.impl;
 import com.devanshsk.books.domain.entities.AuthorEntity;
 import com.devanshsk.books.repositories.AuthorRepository;
 import com.devanshsk.books.services.AuthorService;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -27,6 +29,11 @@ public class AuthorServiceImpl implements AuthorService {
     @Override
     public List<AuthorEntity> findAll() {
         return authorRepository.findAll();
+    }
+
+    @Override
+    public Slice<AuthorEntity> findAll(Pageable pageable) {
+        return authorRepository.findAllBy(pageable);
     }
 
     @Override

@@ -6,6 +6,8 @@ import com.devanshsk.books.domain.entities.BookEntity;
 import com.devanshsk.books.mappers.Mapper;
 import com.devanshsk.books.services.BookService;
 import lombok.extern.java.Log;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,10 +29,16 @@ public class BookController {
         this.bookService = bookService;
     }
 
+//    @GetMapping
+//    public List<BookDto> listBooks(){
+//        List<BookEntity> books = bookService.findAll();
+//        return books.stream().map(bookMapper::mapTo).collect(Collectors.toList());
+//    }
+
     @GetMapping
-    public List<BookDto> listBooks(){
-        List<BookEntity> books = bookService.findAll();
-        return books.stream().map(bookMapper::mapTo).collect(Collectors.toList());
+    public Page<BookDto> listBooks(Pageable pageable){
+        Page<BookEntity> books = bookService.findAll(pageable);
+        return books.map(bookMapper::mapTo);
     }
 
     @GetMapping("/{isbn}")
